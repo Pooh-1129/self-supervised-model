@@ -1,0 +1,100 @@
+=== (a) Perplexity Analysis ===
+Original paragraph perplexity: 27.0559
+Shuffled paragraph perplexity:  28.7945
+=== (b) Sampling Comparison (prompt: 'Once upon a time') ===
+-- Greedy decoding --
+Once upon a time of war, the United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The
+
+-- Temperature sampling (T=0.0) --
+Once upon a time of war, the United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The United States was the only country in the world to have a military presence. The
+
+-- Temperature sampling (T=0.3) --
+Once upon a time of war, the people of the world were not only fighting for the survival of their land, but also the protection of their land.
+
+
+The war was a war of conquest, and the people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the survival of their land, but also the protection of their land.
+The people of the world were not only fighting for the
+
+-- Temperature sampling (T=0.6) --
+Once upon a time when people were growing up in the West, the majority of people were still living in the West. The majority of people living in the West were still living in the West. The majority of people living in the West were still living in the West.
+
+
+
+
+
+
+
+
+
+
+There is no evidence that the vast majority of people living in the West are living in the West. The fact that the majority of people living in the West are living in the West is alarming to many.
+
+
+The majority of people living in the West are living in the West.
+The vast majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people living in the West are living in the West.
+The majority of people
+
+-- Temperature sampling (T=0.9) --
+Once upon a time, there may have been a time in which men had sex in common.
+
+
+And then a man might have felt his sense of humor was about to change. The next morning, when he was six in the morning, he began to pull himself to the ground. In the midst of the sex act, his hands began to swell.
+And then the two men were sitting on their hands. Then he thrust his head, and his legs started to tingle.
+In that instant, the entire length of his body began to sag in the crotch, as much as it was capable of moving in that direction.
+The man who was once a child could see that his legs were twitching, he was in the middle of a long, hard, hard, long, hard, strong, strong, strong, great, powerful, powerful, strong, powerful, powerful, strong, powerful, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, solid, strong, strong, strong, strong, strong, strong, weak, strong, strong, strong, strong, strong, strong, strong, strong, strong, strong, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free, free
+
+-- Temperature sampling (T=1.2) --
+Once upon a time a great-grandstanding is achieved by the act, it is the very act that we should seek—to maintain and maintain—these things and to remember their true identities as we speak ourselves. This is the spirit, which I have in one of the oldest of our species, by which only a little of the rest will be exposed.
+
+
+
+At least as much people can know in that respect and understanding it does not lead to the development where it is impossible to say that what is achieved remains in nature, or that no matter how complex or complex the task is, nothing and nothing is possible. I have become the subject and witness of our relationship with, in time and again, each and every relationship has its different and greater ramifications, and as long as our relationship between two peoples may become in some form, but on the one hand, there can be little doubt that a great-grandstanding has not changed. If only as a matter of necessity could all of us follow the example of our ancestors being, and we should all follow our own self-evident beliefs and live, we as a whole should be thankful to all of us—but that such a good-grandstanding can be fulfilled, and that the great-grandstanding never gets worse. If everyone learns well and understands that, just as all the great-grandstanding is accomplished—and we do not experience, that it is possible to achieve it all of humanity and no matter how difficult of human thought is to learn it all and make an admirable life work, nothing seems very possible for many, many individuals or groups of people who already own it for our whole life even without knowing who we are or we can do it all. And if one is not doing it at all, and therefore having not yet learned how to do it all, without knowing even how to do this, without knowing at all what level or form such a life may be, that, in some way, not knowing in how different the course of life might be and the degree of success that will be obtained, what will happen is often more difficult to do than a great-grandstanding. If we do not learn a great-great-grandstanding in a meaningful, meaningful, and important way even, it is impossible to find out the truth and the consequences. There is no perfect, perfect, or perfect-perfect, or perfect-perfect, and, if an excellent-grandstanding is made even of its parts and sometimes
+
+-- Temperature sampling (T=1.5) --
+Once upon a time of disaster at Fukushima , we have created a global network called Global Health (Global Health Consortium ).
+In December 2003 our researchers analyzed global health status by calculating global air quality indicators from global medical providers, WHO or WHO as a whole . As these health factors are then assessed more often throughout all life events including the year 1990-1994 by the World Health Organization .
+Worldwide in 2010 (2012), WHO had 628 global medical organizations with a total of 1600 health, including over half-billion adults. In the 1990-95 year (2008) the global mortality rates ranged from approximately 490,100 people to 979,000 worldwide.
+Global death was diagnosed in 2014, and the WHO estimated mortality is the largest worldwide incident in which people are reported to end their lives (one per 99.9 million human deaths per year due to accident, an age of 80 is associated with 5.4 % death each year and about 4.0 % survival each term). As data are processed there are five main ways available (e.g. the WHO estimates deaths, death, age in death from stroke, accident or serious internal bleeding of the liver ).
+Global heart rate was first and foremost examined by WHO with World Health Organisation 2010-06 using World Health Organisation 2010-07 to measure global heart mortality data. For global events in 2001–2010 health figures are plotted in Tables A and B.
+
