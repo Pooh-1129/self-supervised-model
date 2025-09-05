@@ -1,148 +1,158 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
-from peft import get_peft_model, LoraConfig, TaskType
-from datasets import load_dataset, DatasetDict
+import os
 import numpy as np
-import evaluate
+import matplotlib.pyplot as plt
 import torch
+from datasets import load_dataset, DatasetDict
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    Trainer,
+    TrainingArguments,
+    TrainerCallback,
+)
+import evaluate
+from peft import get_peft_model, LoraConfig, TaskType
 
-# Dataset: wics/strategy-qa (strategyQA subset). It often only provides a 'test' split.
-raw = load_dataset(path="wics/strategy-qa")
+# --- 1. Data Loading and Preparation ---
+# (This section is identical to the head-tuning script)
 
-# Derive deterministic 80/10/10 train/val/test if only 'test' exists
-if set(raw.keys()) == {"test"}:
-    base = raw["test"]
-    split80_20 = base.train_test_split(test_size=0.2, seed=42)
-    val_test = split80_20["test"].train_test_split(test_size=0.5, seed=42)
+raw_dataset = load_dataset("wics/strategy-qa", revision="refs/convert/parquet")
+
+
+if set(raw_dataset.keys()) == {"test"}:
+    base = raw_dataset["test"]
+
+    def create_label_column(example):
+        ans = example.get("answer")
+        if isinstance(ans, str):
+            ans = ans.strip().lower()
+        return {"labels": 1 if ans in (True, "yes", 1) else 0}
+
+    processed_ds = base.map(create_label_column, remove_columns=["answer"])
+    processed_ds = processed_ds.class_encode_column("labels")
+
+    split_80_20 = processed_ds.train_test_split(test_size=0.2, seed=42, stratify_by_column="labels")
+    val_test_split = split_80_20["test"].train_test_split(test_size=0.5, seed=42, stratify_by_column="labels")
+    
     ds = DatasetDict({
-        "train": split80_20["train"],
-        "validation": val_test["train"],
-        "test": val_test["test"],
+        "train": split_80_20["train"],
+        "validation": val_test_split["train"],
+        "test": val_test_split["test"],
     })
 else:
-    ds = raw
+    ds = raw_dataset
 
-# Tokenizer and model
 model_name = "answerdotai/ModernBERT-base"
 tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+
 if tokenizer.pad_token is None and tokenizer.eos_token is not None:
     tokenizer.pad_token = tokenizer.eos_token
-
-model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
-metric = evaluate.load("accuracy")
-
-# Label mapping and tokenization
-def map_label(example):
-    ans = example.get("answer")
-    if isinstance(ans, str):
-        ans = ans.strip().lower()
-    label = 1 if ans in (True, "yes", 1) else 0
-    example["labels"] = label
-    return example
 
 def tokenize_function(batch):
     return tokenizer(batch["question"], padding="max_length", truncation=True, max_length=256)
 
-ds = ds.map(map_label)
-ds = ds.remove_columns([c for c in ds["train"].column_names if c not in {"question", "labels"}])
-encoded_dataset = ds.map(tokenize_function, batched=True, remove_columns=["question"]).with_format("torch")
+tokenized_ds = ds.map(tokenize_function, batched=True, remove_columns=[c for c in ds["train"].column_names if c != "labels"])
+tokenized_ds.set_format("torch")
 
-# Compute head-only trainable parameter target (exclude classifier bias to match exactly with LoRA)
-head_params = 0
-if hasattr(model, "classifier"):
-    for n, p in model.classifier.named_parameters():
-        if p.requires_grad:
-            head_params += p.numel()
-    # Exclude bias if present to make it divisible by (in+out) of typical linear layers
-    if hasattr(model.classifier, "bias") and model.classifier.bias is not None:
-        head_params -= model.classifier.bias.numel()
-else:
-    # Fallback: try to find final classifier module by name pattern
-    for n, p in model.named_parameters():
-        if ".classifier." in n and p.requires_grad:
-            head_params += p.numel()
-
-target_module_name = None
-target_in = None
-target_out = None
-
-for name, module in model.named_modules():
-    if isinstance(module, torch.nn.Linear):
-        in_f = module.in_features
-        out_f = module.out_features
-        s = in_f + out_f
-        if s > 0 and head_params % s == 0:
-            target_module_name = name
-            target_in = in_f
-            target_out = out_f
-            break
-
-if target_module_name is None:
-    raise RuntimeError(f"Could not find a single linear module whose (in+out) divides head params: {head_params}")
-
-r = head_params // (target_in + target_out)
-assert r > 0, "Computed LoRA rank must be positive"
-
-# Configure LoRA to adapt exactly one module to match parameter count with head-only
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
+# for name, module in model.named_modules():
+#     print(name)
+# Define LoRA configuration
 lora_config = LoraConfig(
     task_type=TaskType.SEQ_CLS,
-    inference_mode=False,
-    r=r,
-    lora_alpha=max(16, 2 * r),
+    r=1,  # Rank of the matrix decomposition
+    lora_alpha=16,  # LoRA hyperparameter
+    # Target modules: Only the 'Wo' output layer (attention.output.dense) in ALL
+    # transformer attention layers. The full module name is 'bert.encoder.layer.{i}.attention.output.dense'
+    target_modules=["layers.21.attn.Wo"],
     lora_dropout=0.1,
-    target_modules=[target_module_name],
+    bias="none", # Do not train bias terms
 )
 
 model = get_peft_model(model, lora_config)
+print("Trainable parameters:")
+model.print_trainable_parameters()
 
-# Sanity check trainable parameter count matches
-def count_trainable(m):
-    return sum(p.numel() for p in m.parameters() if p.requires_grad)
 
-lora_trainable = count_trainable(model)
-print(f"LoRA target module: {target_module_name}, in+out={target_in+target_out}, r={r}, trainable={lora_trainable}, head_target={head_params}")
-if lora_trainable != head_params:
-    raise RuntimeError(f"LoRA trainable params ({lora_trainable}) != head-only target ({head_params})")
-
+metric = evaluate.load("accuracy")
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
+    # PEFT model logits can be in a tuple
+    if isinstance(logits, tuple):
+        logits = logits[0]
     predictions = np.argmax(logits, axis=-1)
     return metric.compute(predictions=predictions, references=labels)
 
-# Training arguments
+class AccuracyLoggerCallback(TrainerCallback):
+    def __init__(self, trainer):
+        super().__init__()
+        self.trainer = trainer
+        self.epochs = []
+        self.train_acc = []
+        self.eval_acc = []
+
+    def on_epoch_end(self, args, state, control, **kwargs):
+        train_metrics = self.trainer.evaluate(eval_dataset=self.trainer.train_dataset, metric_key_prefix="train")
+        eval_metrics = self.trainer.evaluate(eval_dataset=self.trainer.eval_dataset, metric_key_prefix="eval")
+        
+        self.epochs.append(state.epoch)
+        self.train_acc.append(train_metrics.get("train_accuracy", float("nan")))
+        self.eval_acc.append(eval_metrics.get("eval_accuracy", float("nan")))
+        print(f"Epoch {state.epoch}: Train Acc = {self.train_acc[-1]}, Eval Acc = {self.eval_acc[-1]}")
+
+output_dir = os.path.join(os.getcwd(), "outputs_lora_tuning")
+os.makedirs(output_dir, exist_ok=True)
+
 training_args = TrainingArguments(
+    output_dir=os.path.join(output_dir, "checkpoints"),
     per_device_train_batch_size=16,
     per_device_eval_batch_size=32,
-    num_train_epochs=6,
-    logging_dir="logs/lora/",
-    report_to=["none"],
+    learning_rate=2e-4,
+    num_train_epochs=10,
+    weight_decay=0.01,
+    warmup_steps=100,
+    report_to="tensorboard",
+    logging_dir=os.path.join(output_dir, "logs"),
     logging_strategy="epoch",
-    evaluation_strategy="epoch",
+    eval_strategy="epoch",
     save_strategy="epoch",
-    save_total_limit=2,
+    save_total_limit=1,
     load_best_model_at_end=True,
     metric_for_best_model="eval_accuracy",
     greater_is_better=True,
-    output_dir="checkpoints/lora/",
-    learning_rate=5e-4,
     seed=42,
 )
 
-# Trainer
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=encoded_dataset["train"],
-    eval_dataset=encoded_dataset["validation"],
-    compute_metrics=compute_metrics
+    train_dataset=tokenized_ds["train"],
+    eval_dataset=tokenized_ds["validation"],
+    tokenizer=tokenizer,
+    compute_metrics=compute_metrics,
 )
 
-# Train
+acc_logger = AccuracyLoggerCallback(trainer)
+trainer.add_callback(acc_logger)
+
 trainer.train()
 
-# Evaluate
-test_result = trainer.evaluate(encoded_dataset["test"]) if "test" in encoded_dataset else trainer.evaluate(encoded_dataset["validation"])
-val_result = trainer.evaluate(encoded_dataset["validation"])
-print(f'test_result:{test_result}, val_result: {val_result}')
+test_metrics = trainer.evaluate(eval_dataset=tokenized_ds.get("test", tokenized_ds["validation"]), metric_key_prefix="test")
+print("Test set results:")
+print({k: float(v) for k, v in test_metrics.items()})
 
-# Save
-model.save_pretrained("best/lora/")
+
+plt.style.use('seaborn-v0_8-whitegrid')
+plt.figure(figsize=(8, 5))
+plt.plot(acc_logger.epochs, acc_logger.train_acc, marker="o", linestyle='-', label="Train")
+plt.plot(acc_logger.epochs, acc_logger.eval_acc, marker="s", linestyle='--', label="Validation (Dev)")
+plt.xlabel("Epoch")
+plt.ylabel("Accuracy")
+plt.title("ModernBERT with LoRA Accuracy on StrategyQA")
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(output_dir, "accuracy_plot_lora.png"), dpi=160)
+plt.close()
+
+print(f"\nAccuracy plot saved to: {os.path.join(output_dir, 'accuracy_plot_lora.png')}")
+
